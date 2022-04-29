@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -18,6 +19,7 @@ namespace world4u_admin
         private DataSet dataSet = null;
         //Ссылки на DataAdapter для группы и студента
         private NpgsqlDataAdapter gisDataAdapter = null;
+        private NpgsqlDataAdapter jsonDataAdapter = null;
         public Form1()
         {
             InitializeComponent();
@@ -33,6 +35,7 @@ namespace world4u_admin
             {
                 dataSet = new DataSet();
                 dataSet.Tables.Add("Gis");
+                dataSet.Tables.Add("Json");
             }
             return dataSet;
         }
@@ -97,7 +100,7 @@ namespace world4u_admin
             gisDataAdapter = new NpgsqlDataAdapter(
             "SELECT gid,\"name\",fugitive_status,general_info,entry_doc,reg_doc,transport,housing,nutrition,pets,charity,add_info " +
             "FROM world_boundaries " +
-            "where \"name\" like '%"+textBox1.Text+"%'", connection);
+            "where \"name\" like '%" + textBox1.Text + "%'", connection);
             new NpgsqlCommandBuilder(gisDataAdapter);
             gisDataAdapter.Fill(getDataSet(), "Gis");
             dataGridView1.DataSource = getDataSet().Tables["Gis"];
@@ -139,33 +142,33 @@ namespace world4u_admin
         private string emptyCheckStr(object str) {
             return DBNull.Value.Equals(str) ? String.Empty : (string)str;
         }
-        public void UpdateInfo(int row, int? fugitive_status, string general_info, 
-            string entry_doc, string reg_doc, 
+        public void UpdateInfo(int row, int? fugitive_status, string general_info,
+            string entry_doc, string reg_doc,
             string transport, string housing,
-            string nutrition, string pets, 
+            string nutrition, string pets,
             string charity, string add_info)
         {
-            if(fugitive_status == null)
+            if (fugitive_status == null)
                 getDataSet().Tables["Gis"].Rows[row]["fugitive_status"] = DBNull.Value;
             else
                 getDataSet().Tables["Gis"].Rows[row]["fugitive_status"] = fugitive_status;
 
-            if(general_info == "")
+            if (general_info == "")
                 getDataSet().Tables["Gis"].Rows[row]["general_info"] = DBNull.Value;
             else
                 getDataSet().Tables["Gis"].Rows[row]["general_info"] = general_info;
 
-            if(entry_doc == "")
+            if (entry_doc == "")
                 getDataSet().Tables["Gis"].Rows[row]["entry_doc"] = DBNull.Value;
             else
                 getDataSet().Tables["Gis"].Rows[row]["entry_doc"] = entry_doc;
 
-            if(reg_doc == "")
+            if (reg_doc == "")
                 getDataSet().Tables["Gis"].Rows[row]["reg_doc"] = DBNull.Value;
             else
                 getDataSet().Tables["Gis"].Rows[row]["reg_doc"] = reg_doc;
 
-            if(transport == "")
+            if (transport == "")
                 getDataSet().Tables["Gis"].Rows[row]["transport"] = DBNull.Value;
             else
                 getDataSet().Tables["Gis"].Rows[row]["transport"] = transport;
@@ -175,27 +178,59 @@ namespace world4u_admin
             else
                 getDataSet().Tables["Gis"].Rows[row]["housing"] = housing;
 
-            if(nutrition == "")
+            if (nutrition == "")
                 getDataSet().Tables["Gis"].Rows[row]["nutrition"] = DBNull.Value;
             else
                 getDataSet().Tables["Gis"].Rows[row]["nutrition"] = nutrition;
 
-            if(pets == "")
+            if (pets == "")
                 getDataSet().Tables["Gis"].Rows[row]["pets"] = DBNull.Value;
             else
                 getDataSet().Tables["Gis"].Rows[row]["pets"] = pets;
 
-            if(charity == "")
+            if (charity == "")
                 getDataSet().Tables["Gis"].Rows[row]["charity"] = DBNull.Value;
             else
                 getDataSet().Tables["Gis"].Rows[row]["charity"] = charity;
 
-            if(add_info == "")
+            if (add_info == "")
                 getDataSet().Tables["Gis"].Rows[row]["add_info"] = add_info;
             else
                 getDataSet().Tables["Gis"].Rows[row]["add_info"] = add_info;
             gisDataAdapter.Update(getDataSet(), "Gis");
         }
 
+        private void writejsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string path = "";
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                path = fbd.SelectedPath;
+            }
+            
+
+            getDataSet().Tables["Json"].Clear();
+            jsonDataAdapter = new NpgsqlDataAdapter(
+            "select st_asgeojson(world_boundaries.*) from world_boundaries;", connection);
+            new NpgsqlCommandBuilder(jsonDataAdapter);
+            jsonDataAdapter.Fill(getDataSet(), "Json");
+            DataTable dt = getDataSet().Tables["Json"];
+            if (dt.Rows.Count > 0)
+            {
+                string str = "var json_Territories_2 = {\n"
+                + "\"type\": \"FeatureCollection\",\n"
+                + "\"name\": \"Territories_2\",\n"
+                + "\"crs\": { \"type\": \"name\", \"properties\": { \"name\": \"urn:ogc:def:crs:OGC:1.3:CRS84\" } },\n"
+                + "\"features\": [\n";
+                foreach (DataRow dr in dt.Rows)
+                    str += dr[0].ToString()+",\n";
+                str = str.Remove(str.Length - 2);
+                str += "]\n}";
+                File.WriteAllText(path + @"\Territories_2.js", str);
+            }
+
+        }
     }
 }

@@ -76,26 +76,27 @@
             // connectToolStripMenuItem
             // 
             this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            this.connectToolStripMenuItem.Size = new System.Drawing.Size(165, 26);
+            this.connectToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.connectToolStripMenuItem.Text = "Connect";
             this.connectToolStripMenuItem.Click += new System.EventHandler(this.connectToolStripMenuItem_Click);
             // 
             // writejsToolStripMenuItem
             // 
             this.writejsToolStripMenuItem.Name = "writejsToolStripMenuItem";
-            this.writejsToolStripMenuItem.Size = new System.Drawing.Size(165, 26);
+            this.writejsToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.writejsToolStripMenuItem.Text = "Write .js";
+            this.writejsToolStripMenuItem.Click += new System.EventHandler(this.writejsToolStripMenuItem_Click);
             // 
             // pushjsToolStripMenuItem
             // 
             this.pushjsToolStripMenuItem.Name = "pushjsToolStripMenuItem";
-            this.pushjsToolStripMenuItem.Size = new System.Drawing.Size(165, 26);
+            this.pushjsToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.pushjsToolStripMenuItem.Text = "Push ,js";
             // 
             // disconnectToolStripMenuItem
             // 
             this.disconnectToolStripMenuItem.Name = "disconnectToolStripMenuItem";
-            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(165, 26);
+            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.disconnectToolStripMenuItem.Text = "Disconnect";
             this.disconnectToolStripMenuItem.Click += new System.EventHandler(this.disconnectToolStripMenuItem_Click);
             // 
